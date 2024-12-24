@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Config\Database;
 use PDO;
+use Exception;
 
 class User
 {
@@ -23,9 +24,16 @@ class User
         self::init();
 
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-        $sql = "INSERT INTO ". self::$table ." (username, password, role) VALUES (:username, :password, :role)";
-        $stmt = self::$conn->prepare($sql);
-        $stmt->execute([':username' => $username, ':password' => $hashed_password, ':role' => $role]);
+        self::$conn->beginTransaction();
+        try {
+            $sql = "INSERT INTO ". self::$table ." (username, password, role) VALUES (:username, :password, :role)";
+            $stmt = self::$conn->prepare($sql);
+            $stmt->execute([':username' => $username, ':password' => $hashed_password, ':role' => $role]);
+            self::$conn->commit();
+        } catch (Exception $e) {
+            self::$conn->rollBack();
+            throw $e;
+        }
     }
 
     public static function checkUnique($username)

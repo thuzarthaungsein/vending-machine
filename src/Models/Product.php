@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Config\Database;
 use PDO;
+use Exception;
 
 class Product
 {
@@ -32,9 +33,17 @@ class Product
     {
         self::init();
 
-        $sql = "INSERT INTO ". self::$table ." (name, price, available_qty) VALUES (:name, :price, :qty)";
-        $stmt = self::$conn->prepare($sql);
-        $stmt->execute([':name' => $name, ':price' => $price, ':qty' => $available_qty]);
+        self::$conn->beginTransaction();
+        try {
+            $sql = "INSERT INTO ". self::$table ." (name, price, available_qty) VALUES (:name, :price, :qty)";
+            $stmt = self::$conn->prepare($sql);
+            $stmt->execute([':name' => $name, ':price' => $price, ':qty' => $available_qty]);
+            self::$conn->commit();
+        } catch (Exception $e) {
+            self::$conn->rollBack();
+            throw $e;
+        }
+
     }
 
     public static function all()
@@ -51,17 +60,31 @@ class Product
     {
         self::init();
 
-        $sql = "UPDATE ". self::$table ." SET name = :name, price = :price, available_qty = :qty WHERE id = :id";
-        $stmt = self::$conn->prepare($sql);
-        $stmt->execute([':name' => $name, ':price' => $price, ':qty' => $available_qty, ':id' => $id]);
+        self::$conn->beginTransaction();
+        try {
+            $sql = "UPDATE ". self::$table ." SET name = :name, price = :price, available_qty = :qty WHERE id = :id";
+            $stmt = self::$conn->prepare($sql);
+            $stmt->execute([':name' => $name, ':price' => $price, ':qty' => $available_qty, ':id' => $id]);
+            self::$conn->commit();
+        } catch (Exception $e) {
+            self::$conn->rollBack();
+            throw $e;
+        }
     }
 
     public static function delete($id)
     {
         self::init();
 
-        $sql = "DELETE FROM ". self::$table ." WHERE id = :id";
-        $stmt = self::$conn->prepare($sql);
-        $stmt->execute([':id' => $id]);
+        self::$conn->beginTransaction();
+        try {
+            $sql = "DELETE FROM ". self::$table ." WHERE id = :id";
+            $stmt = self::$conn->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            self::$conn->commit();
+        } catch (Exception $e) {
+            self::$conn->rollBack();
+            throw $e;
+        }
     }
 }
