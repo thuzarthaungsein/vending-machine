@@ -1,11 +1,13 @@
 # Use the official PHP image from the Docker Hub
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 # Set the working directory
 WORKDIR /var/www/html
 
 # Copy the current directory contents into the container at /var/www/html
 COPY . .
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Run Composer to install dependencies
 RUN composer clear-cache && composer install

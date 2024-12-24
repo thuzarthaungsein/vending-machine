@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   app:
@@ -6,4 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - '80:80'
+      - "80:80"
+  composer:
+    image: composer:latest
+    volumes:
+      - .:/app
+    command: "true"
