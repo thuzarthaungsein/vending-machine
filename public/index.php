@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 session_start();
 
@@ -14,8 +14,8 @@ $method = $_SERVER['REQUEST_METHOD'];
 $headers = getallheaders();
 $authHeader = $headers['Authorization'] ?? '';
 
-$webRoutes = require_once __DIR__ . '/routes/web.php';
-$apiRoutes = require_once __DIR__ . '/routes/api.php';
+$webRoutes = require_once __DIR__ . '/../routes/web.php';
+$apiRoutes = require_once __DIR__ . '/../routes/api.php';
 
 $allRoutes = array_merge($webRoutes, $apiRoutes);
 
