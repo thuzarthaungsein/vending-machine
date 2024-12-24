@@ -7,8 +7,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - composer
+
   composer:
     image: composer:latest
+    working_dir: /var/www/html
     volumes:
-      - .:/app
-    command: "true"
+      - .:/var/www/html
+    command: ["composer", "install", "--no-dev", "--optimize-autoloader"]
