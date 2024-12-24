@@ -1,0 +1,2 @@
+# Set the default file to serve
+DirectoryIndex index.php index.html
