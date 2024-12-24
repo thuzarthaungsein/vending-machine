@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory
 WORKDIR /var/www/html
 
+RUN chown -R www-data:www-data /var/www/html
+
 # Copy the current directory contents into the container at /var/www/html
 COPY . .
 
