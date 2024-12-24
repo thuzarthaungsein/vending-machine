@@ -30,4 +30,25 @@ class JWTAuth
             return false;
         }
     }
+
+    public function handle(): bool
+    {
+        $headers = getallheaders();
+        if (!isset($headers['Authorization'])) {
+            return false;
+        }
+
+        $authHeader = $headers['Authorization'];
+        [$type, $token] = explode(' ', $authHeader);
+
+        if ($type !== 'Bearer' || empty($token)) {
+            return false;
+        }
+
+        try {
+            return JWT::decode($token, new Key(self::$secretKey, 'HS256'));
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 }

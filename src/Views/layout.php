@@ -30,7 +30,7 @@ $request = $_SERVER['REQUEST_URI'];
             <div style="clear:both;"></div>
         </nav>
     </header>
-    <main class="container">
+    <main class="container" style="min-height:70vh">
     <?php if (isset($_SESSION['error'])): ?>
         <div class="error">
             <?= htmlspecialchars($_SESSION['error']) ?>
