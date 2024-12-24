@@ -2,52 +2,66 @@
 
 namespace App\Models;
 
+use App\Config\Database;
 use PDO;
 
 class Product
 {
-    private $conn;
-    private $table = "products";
+    private static $conn;
+    private static $table = "products";
 
-    public function __construct($db)
+    public static function init()
     {
-        $this->conn = $db;
+        if (!self::$conn) {
+            $database = new Database();
+            self::$conn = $database->connect();
+        }
     }
 
-    public function show($id)
+    public static function show($id)
     {
-        $sql = "SELECT * FROM ". $this->table ." WHERE id=:id";
-        $stmt = $this->conn->prepare($sql);
+        self::init();
+
+        $sql = "SELECT * FROM ". self::$table ." WHERE id=:id";
+        $stmt = self::$conn->prepare($sql);
         $stmt->execute([':id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function create($name, $price, $available_qty)
+    public static function create($name, $price, $available_qty)
     {
-        $sql = "INSERT INTO ". $this->table ." (name, price, available_qty) VALUES (:name, :price, :qty)";
-        $stmt = $this->conn->prepare($sql);
+        self::init();
+
+        $sql = "INSERT INTO ". self::$table ." (name, price, available_qty) VALUES (:name, :price, :qty)";
+        $stmt = self::$conn->prepare($sql);
         $stmt->execute([':name' => $name, ':price' => $price, ':qty' => $available_qty]);
     }
 
-    public function list()
+    public static function all()
     {
-        $sql = "SELECT * FROM ". $this->table;
-        $stmt = $this->conn->prepare($sql);
+        self::init();
+
+        $sql = "SELECT * FROM ". self::$table;
+        $stmt = self::$conn->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function update($id, $name, $price, $available_qty)
+    public static function update($id, $name, $price, $available_qty)
     {
-        $sql = "UPDATE ". $this->table ." SET name = :name, price = :price, available_qty = :qty WHERE id = :id";
-        $stmt = $this->conn->prepare($sql);
+        self::init();
+
+        $sql = "UPDATE ". self::$table ." SET name = :name, price = :price, available_qty = :qty WHERE id = :id";
+        $stmt = self::$conn->prepare($sql);
         $stmt->execute([':name' => $name, ':price' => $price, ':qty' => $available_qty, ':id' => $id]);
     }
 
-    public function delete($id)
+    public static function delete($id)
     {
-        $sql = "DELETE FROM ". $this->table ." WHERE id = :id";
-        $stmt = $this->conn->prepare($sql);
+        self::init();
+
+        $sql = "DELETE FROM ". self::$table ." WHERE id = :id";
+        $stmt = self::$conn->prepare($sql);
         $stmt->execute([':id' => $id]);
     }
 }

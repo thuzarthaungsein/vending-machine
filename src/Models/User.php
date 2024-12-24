@@ -2,30 +2,38 @@
 
 namespace App\Models;
 
+use App\Config\Database;
 use PDO;
 
 class User
 {
-    private $conn;
-    private $table = "users";
+    private static $conn;
+    private static $table = "users";
 
-    public function __construct($db)
+    public static function init()
     {
-        $this->conn = $db;
+        if (!self::$conn) {
+            $database = new Database();
+            self::$conn = $database->connect();
+        }
     }
 
-    public function register($username, $password, $role)
+    public static function register($username, $password, $role)
     {
+        self::init();
+
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-        $sql = "INSERT INTO ". $this->table ." (username, password, role) VALUES (:username, :password, :role)";
-        $stmt = $this->conn->prepare($sql);
+        $sql = "INSERT INTO ". self::$table ." (username, password, role) VALUES (:username, :password, :role)";
+        $stmt = self::$conn->prepare($sql);
         $stmt->execute([':username' => $username, ':password' => $hashed_password, ':role' => $role]);
     }
 
-    public function checkUnique($username)
+    public static function checkUnique($username)
     {
-        $sql = "SELECT * FROM ". $this->table ." WHERE username = :username";
-        $checkStmt = $this->conn->prepare($sql);
+        self::init();
+
+        $sql = "SELECT * FROM ". self::$table ." WHERE username = :username";
+        $checkStmt = self::$conn->prepare($sql);
         $checkStmt->execute(['username' => $username]);
 
         if ($checkStmt->rowCount() < 1) {
@@ -35,10 +43,12 @@ class User
         return false;
     }
 
-    public function login($username, $password)
+    public static function login($username, $password)
     {
-        $sql = "SELECT * FROM ". $this->table ." WHERE username = :username";
-        $stmt = $this->conn->prepare($sql);
+        self::init();
+
+        $sql = "SELECT * FROM ". self::$table ." WHERE username = :username";
+        $stmt = self::$conn->prepare($sql);
         $stmt->execute([':username' => $username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -48,5 +58,16 @@ class User
             return true;
         }
         return false;
+    }
+
+    public static function find($username)
+    {
+        self::init();
+
+        $sql = "SELECT * FROM users WHERE username = :username";
+        $stmt = self::$conn->prepare($sql);
+        $stmt->execute([':username' => $username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $user;
     }
 }

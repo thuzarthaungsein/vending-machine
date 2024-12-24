@@ -8,25 +8,15 @@ use App\Models\Transaction;
 
 class ProductsController extends BaseController
 {
-    private $conn;
-    private $model;
-
-    public function __construct()
-    {
-        $database = new Database();
-        $this->conn = $database->connect();
-        $this->model = new Product($this->conn);
-    }
-
     public function list()
     {
-        $data = $this->model->list();
+        $data = Product::all();
         $this->view('/admin/product/list', $data);
     }
 
     public function shop()
     {
-        $data = $this->model->list();
+        $data = Product::all();
         $this->view('/user/shop', $data);
     }
 
@@ -42,7 +32,7 @@ class ProductsController extends BaseController
 
     public function edit($id)
     {
-        $data = $this->model->show($id);
+        $data = Product::show($id);
         $this->view('/admin/product/edit', $data);
     }
 
@@ -52,7 +42,7 @@ class ProductsController extends BaseController
         $price = (float)$_POST['price'];
         $availableQty = (int)$_POST['available_qty'];
 
-        $this->model->update($id, $name, $price, $availableQty);
+        Product::update($id, $name, $price, $availableQty);
 
         $_SESSION['success'] = "Product updated successfully.";
         header("Location: /products");
@@ -71,7 +61,7 @@ class ProductsController extends BaseController
             exit;
         }
 
-        $this->model->create($name, $price, $availableQty);
+        Product::create($name, $price, $availableQty);
 
         $_SESSION['success'] = "Product created successfully.";
         header("Location: /products");
@@ -89,7 +79,7 @@ class ProductsController extends BaseController
             exit;
         }
 
-        $productDetails = $this->model->show($productId);
+        $productDetails = Product::show($productId);
 
         if (!$productDetails || $productDetails['available_qty'] < $quantity) {
             $_SESSION['error'] = "Insufficient stock or product not found.";
@@ -97,8 +87,7 @@ class ProductsController extends BaseController
             exit;
         }
 
-        $transaction = new Transaction($this->conn);
-        $transaction->add($_SESSION['user']['id'], $productId, $quantity);
+        Transaction::add($_SESSION['user']['id'], $productId, $quantity);
 
         $_SESSION['success'] = "Purchase successful!";
         header("Location: /shop");
@@ -107,7 +96,7 @@ class ProductsController extends BaseController
 
     public function destroy($id)
     {
-        $this->model->delete($id);
+        Product::delete($id);
         $_SESSION['success'] = "Delete successful!";
         header("Location: /products");
         exit;

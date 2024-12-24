@@ -8,14 +8,6 @@ use PDOException;
 
 class AuthController extends BaseController
 {
-    private $conn;
-
-    public function __construct()
-    {
-        $database = new Database();
-        $this->conn = $database->connect();
-    }
-
     public function showLoginForm()
     {
         $this->view('login');
@@ -30,8 +22,8 @@ class AuthController extends BaseController
     {
         $username = $_POST['username'] ?? null;
         $password = $_POST['password'] ?? null;
-        $user = new User($this->conn);
-        if ($user->login($username, $password)) {
+        $status = User::login($username, $password);
+        if ($status) {
             if ($_SESSION['user']['role'] === 'admin') {
                 header("Location: /admin/dashboard");
                 exit;
@@ -64,14 +56,14 @@ class AuthController extends BaseController
             $_SESSION['error'] = "Password must be at least 6 characters";
         } else {
             try {
-                $user = new User($this->conn);
-                if (!$user->checkUnique($username)) {
+                $check = User::checkUnique($username);
+                if (!$check) {
                     $_SESSION['error'] = "Username already exists!";
                     header("Location: /register");
                     exit;
                 }
 
-                $user->register($username, $password, $role);
+                User::register($username, $password, $role);
 
                 $_SESSION['success'] = "Registration successful!";
                 header("Location: /login");
@@ -83,8 +75,6 @@ class AuthController extends BaseController
                 exit;
             }
         }
-
-
     }
 
     public function dashboard()
@@ -92,12 +82,4 @@ class AuthController extends BaseController
         $this->view('/admin/dashboard');
     }
 
-    // public function shop()
-    // {
-    //     if ($_SESSION['user']['role'] === 'user') {
-    //         $this->view('/admin/dashboard');
-    //     } else {
-    //         $this->view('/user/shop');
-    //     }
-    // }
 }
