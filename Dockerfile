@@ -7,11 +7,8 @@ WORKDIR /var/www/html
 # Copy the current directory contents into the container at /var/www/html
 COPY . .
 
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
 # Run Composer to install dependencies
-RUN composer install --no-dev --optimize-autoloader
+RUN composer clear-cache && composer install
 
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html

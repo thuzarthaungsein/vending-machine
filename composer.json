@@ -1,5 +1,6 @@
 {
   "name": "my/project",
+  "description": "Code challenge for fullstack or backend developer position",
   "autoload": {
     "psr-4": {
       "App\\": "src/"
