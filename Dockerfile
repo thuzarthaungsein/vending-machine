@@ -2,7 +2,10 @@
 FROM php:8.3-apache
 
 # Install required PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql mysqli
+RUN apt-get update && apt-get install -y \
+libzip-dev \
+unzip \
+&& docker-php-ext-install pdo pdo_mysql mysqli zip
 
 # Enable Apache mod_rewrite for SEO-friendly URLs
 RUN a2enmod rewrite
