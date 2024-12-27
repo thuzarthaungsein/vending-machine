@@ -1,4 +1,3 @@
-# Use the official PHP image from the Docker Hub
 FROM php:8.3-apache
 
 # Install required PHP extensions
