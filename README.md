@@ -4,7 +4,7 @@ I specialize in developing web applications with Laravel, and this project showc
 
 ### Key features include:
 
-- PHP
+- PHP (8.2^)
 - MySQL
 - SEO-friendly URLs
 - RESTful API
